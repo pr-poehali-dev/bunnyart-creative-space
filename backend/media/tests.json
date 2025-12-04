@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "name": "Get all media items",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": [],
+      "bodyMatcher": "type"
+    },
+    {
+      "name": "Create new media item",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "title": "Test Photo",
+        "type": "photo",
+        "url": "https://example.com/photo.jpg"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": "number",
+        "title": "string",
+        "type": "string",
+        "url": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

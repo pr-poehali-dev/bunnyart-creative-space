@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/BunnyArt/Header';
 import Footer from '@/components/BunnyArt/Footer';
 import HomeSection from '@/components/BunnyArt/HomeSection';
@@ -6,6 +6,8 @@ import GallerySection from '@/components/BunnyArt/GallerySection';
 import NewsSection from '@/components/BunnyArt/NewsSection';
 import ContactSection from '@/components/BunnyArt/ContactSection';
 import MediaModal from '@/components/BunnyArt/MediaModal';
+
+const MEDIA_API = 'https://functions.poehali.dev/70267a36-8967-4037-bd39-69cef143b46d';
 
 type Section = 'home' | 'photos' | 'videos' | 'tracks' | 'texts' | 'news' | 'contact';
 
@@ -30,39 +32,49 @@ export default function Index() {
   const [currentSection, setCurrentSection] = useState<Section>('home');
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [commentText, setCommentText] = useState('');
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
 
-  const mediaItems: MediaItem[] = [
-    {
-      id: 1,
-      title: 'Творческий абстракт',
-      type: 'photo',
-      url: 'https://cdn.poehali.dev/projects/0087cf7c-124a-4d10-ab16-c06edb0e8d5d/files/353ce9a4-1531-4786-8e2d-ee8d9c0ac902.jpg',
-      thumbnail: 'https://cdn.poehali.dev/projects/0087cf7c-124a-4d10-ab16-c06edb0e8d5d/files/353ce9a4-1531-4786-8e2d-ee8d9c0ac902.jpg',
-      likes: 42,
-      comments: []
-    },
-    {
-      id: 2,
-      title: 'Художественная мастерская',
-      type: 'photo',
-      url: 'https://cdn.poehali.dev/projects/0087cf7c-124a-4d10-ab16-c06edb0e8d5d/files/9f64844c-a47c-4328-bdce-9535945373d1.jpg',
-      thumbnail: 'https://cdn.poehali.dev/projects/0087cf7c-124a-4d10-ab16-c06edb0e8d5d/files/9f64844c-a47c-4328-bdce-9535945373d1.jpg',
-      likes: 38,
-      comments: []
-    },
-    {
-      id: 3,
-      title: 'Музыкальная студия',
-      type: 'track',
-      url: 'https://cdn.poehali.dev/projects/0087cf7c-124a-4d10-ab16-c06edb0e8d5d/files/7fc17d9c-3bb2-41d9-85bc-f67e7857b5fd.jpg',
-      thumbnail: 'https://cdn.poehali.dev/projects/0087cf7c-124a-4d10-ab16-c06edb0e8d5d/files/7fc17d9c-3bb2-41d9-85bc-f67e7857b5fd.jpg',
-      likes: 56,
-      comments: []
+  useEffect(() => {
+    loadMedia();
+  }, []);
+
+  const loadMedia = async () => {
+    try {
+      const response = await fetch(MEDIA_API);
+      const data = await response.json();
+      setMediaItems(data.map((item: any) => ({
+        ...item,
+        comments: []
+      })));
+    } catch (error) {
+      console.error('Failed to load media:', error);
     }
-  ];
+  };
 
-  const handleLike = (itemId: number) => {
-    console.log(`Liked item ${itemId}`);
+  const handleLike = async (itemId: number) => {
+    const item = mediaItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    try {
+      await fetch(MEDIA_API, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: itemId,
+          likes: item.likes + 1
+        })
+      });
+      
+      setMediaItems(prev => prev.map(i => 
+        i.id === itemId ? { ...i, likes: i.likes + 1 } : i
+      ));
+      
+      if (selectedItem?.id === itemId) {
+        setSelectedItem({ ...selectedItem, likes: selectedItem.likes + 1 });
+      }
+    } catch (error) {
+      console.error('Failed to like:', error);
+    }
   };
 
   const handleComment = (itemId: number) => {
