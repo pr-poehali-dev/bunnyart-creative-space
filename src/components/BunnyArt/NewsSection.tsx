@@ -1,5 +1,4 @@
 import Icon from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 export default function NewsSection() {
@@ -24,9 +23,6 @@ export default function NewsSection() {
                   Рад представить вам новую серию фотографий, созданных в этом месяце. 
                   Эксперименты со светом и цветом открыли новые горизонты творчества.
                 </p>
-                <Button variant="link" className="p-0 h-auto">
-                  Читать далее <Icon name="ArrowRight" size={16} />
-                </Button>
               </div>
             </div>
           </Card>
