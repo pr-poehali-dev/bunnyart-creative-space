@@ -25,9 +25,10 @@ export default function Header({ currentSection, onSectionChange }: HeaderProps)
         <div className="flex items-center justify-between">
           <button 
             onClick={() => onSectionChange('home')}
-            className="text-2xl font-heading font-bold text-gradient hover-scale"
+            className="flex items-center gap-2 font-heading font-bold hover-scale"
           >
-            BunnyArt
+            <span className="text-3xl">🐰</span>
+            <span className="text-2xl text-gradient">BunnyArt</span>
           </button>
           
           <nav className="hidden md:flex items-center gap-2">
